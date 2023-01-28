@@ -1,7 +1,8 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.6'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'org.springframework.boot' version '3.0.2'
+	id 'io.spring.dependency-management' version '1.1.0'
 	id 'java'
+	id "org.sonarqube" version "3.5.0.2730"
 }
 
 group = 'com.mitocode'
@@ -22,10 +23,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'com.google.code.gson:gson'
+	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+	implementation 'io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE'
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2'
+	implementation 'com.google.code.gson:gson:2.10.1'
+	implementation 'io.projectreactor.addons:reactor-extra'
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'io.r2dbc:r2dbc-postgresql'
-    runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
