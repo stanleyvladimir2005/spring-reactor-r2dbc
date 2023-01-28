@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS meseroapp;
+CREATE TABLE  dish  (id SERIAL PRIMARY KEY, name VARCHAR(50), price NUMERIC(10,2), status BOOLEAN);
+CREATE TABLE  client (id SERIAL PRIMARY KEY, first_name VARCHAR(50), last_name VARCHAR(50), birthday TIMESTAMP WITHOUT TIME ZONE, url_photo VARCHAR(200));
