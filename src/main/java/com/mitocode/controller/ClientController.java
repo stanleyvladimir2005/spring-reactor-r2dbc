@@ -60,19 +60,18 @@ public class ClientController {
     public Mono<ResponseEntity<Client>> update(@Valid @RequestBody Client client, @PathVariable("id") Integer id){
         Mono<Client> monoclient = Mono.just(client);
         Mono<Client> monoBD = service.findById(id);
-        return monoBD
-                .zipWith(monoclient, (bd, pl) -> {
-                    bd.setId(id);
-                    bd.setFirstName(pl.getFirstName());
-                    bd.setLastName(pl.getLastName());
-                    bd.setBirthday(pl.getBirthday());
-                    bd.setUrlPhoto(pl.getUrlPhoto());
-                    return bd;
-                })
-                .flatMap(service::update)
-                .map(pl -> ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(pl))
+        return monoBD.zipWith(monoclient, (bd, pl) -> {
+            bd.setId(id);
+            bd.setFirstName(pl.getFirstName());
+            bd.setLastName(pl.getLastName());
+            bd.setBirthday(pl.getBirthday());
+            bd.setUrlPhoto(pl.getUrlPhoto());
+            return bd;
+        })
+        .flatMap(service::update)
+        .map(pl -> ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(pl))
                 .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
@@ -95,8 +94,8 @@ public class ClientController {
     }
 
     @GetMapping("/pageable")
-    public Mono<ResponseEntity<PageSupport<Client>>> listPagebale
-            (@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size	){
+    public Mono<ResponseEntity<PageSupport<Client>>> listPagebale (@RequestParam(name = "page", defaultValue = "0") int page,
+                                                                   @RequestParam(name = "size", defaultValue = "10") int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         return service.listPage(pageRequest)
                 .map(p -> ResponseEntity.ok()

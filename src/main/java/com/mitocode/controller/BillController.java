@@ -20,7 +20,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -107,7 +106,7 @@ public class BillController {
 
     @GetMapping("/hateoas/{id}")
     public Mono<EntityModel<Bill>> listByHateoas(@PathVariable("id") Integer id){
-        //localhost:8080/Billes/60779cc08e37a27164468033
+        //localhost:8080/Bills/60779cc08e37a27164468033
         Mono<Link> link1 =linkTo(methodOn(BillController.class).findById(id)).withSelfRel().toMono();
         Mono<Link> link2 =linkTo(methodOn(BillController.class).findById(id)).withSelfRel().toMono();
         return link1.zipWith(link2)
@@ -116,7 +115,8 @@ public class BillController {
     }
 
     @GetMapping("/pageable")
-    public Mono<ResponseEntity<PageSupport<Bill>>> listPagebale(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size	){
+    public Mono<ResponseEntity<PageSupport<Bill>>> listPagebale(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                                @RequestParam(name = "size", defaultValue = "10") int size	){
         Pageable pageRequest = PageRequest.of(page, size);
         return service.listPage(pageRequest)
                 .map(p -> ResponseEntity.ok()
