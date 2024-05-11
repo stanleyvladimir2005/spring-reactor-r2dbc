@@ -15,12 +15,12 @@ public class SpringReactorR2dbcApplication {
 		SpringApplication.run(SpringReactorR2dbcApplication.class, args);
 	}
 
-	@Bean
+	/*@Bean
 	public ConnectionFactoryInitializer initializer(ConnectionFactory connectionFactory) {
 		var initializer = new ConnectionFactoryInitializer();
 		initializer.setConnectionFactory(connectionFactory);
 		var populator = new ResourceDatabasePopulator(new ClassPathResource("schema.sql"));
 		initializer.setDatabasePopulator(populator);
 		return initializer;
-	}
+	}*/
 }
