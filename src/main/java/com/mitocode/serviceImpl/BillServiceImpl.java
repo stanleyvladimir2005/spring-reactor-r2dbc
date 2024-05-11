@@ -34,9 +34,12 @@ public class BillServiceImpl extends CRUDImpl<Bill, Integer> implements IBillSer
         return Mono.from(connectionFactory.create())
                 .map(Connection::createBatch)
                 .map(batch -> {
-                    batch.add("INSERT INTO bill (id, description, observation, id_client, create_in) VALUES((SELECT NEXTVAL(pg_get_serial_sequence('bill', 'id'))), '" + bill.getDescription() + "','" + bill.getObservation() + "'," + bill.getIdClient() + ",'" + bill.getCreateIn() + "')");
+                    batch.add("INSERT INTO bill (id, description, observation, id_client, create_in) " +
+                            "VALUES((SELECT NEXTVAL(pg_get_serial_sequence('bill', 'id'))), '" + bill.getDescription()
+                            + "','" + bill.getObservation() + "'," + bill.getIdClient() + ",'" + bill.getCreateIn() + "')");
                     for(BillItem item : bill.getItemsList()) {
-                        batch.add("INSERT INTO bill_item (id, quantity, id_dish) VALUES ((SELECT CURRVAL('bill_id_seq')), " + item.getQuantity() + ", " + item.getDish().getId() +")");
+                        batch.add("INSERT INTO bill_item (id, quantity, id_dish) VALUES ((SELECT CURRVAL('bill_id_seq')),"
+                               +" " + item.getQuantity() + ", " + item.getDish().getId() +")");
                         //CURRVAL solo funciona en la sesion, después de un nextval, seguro en multiusuario
                     }
                     return batch;
@@ -47,7 +50,7 @@ public class BillServiceImpl extends CRUDImpl<Bill, Integer> implements IBillSer
                 .flatMap(x -> client.sql("SELECT last_value FROM bill_id_seq").fetch().one())
                 .flatMap(mapa -> {
                     //System.out.println(id.keySet()); //conocer el KEY del map
-                    Integer id = Integer.parseInt(String.valueOf(mapa.get("last_value")));
+                    var id = Integer.parseInt(String.valueOf(mapa.get("last_value")));
                     bill.setId(id);
                     return Mono.just(bill);
                 });

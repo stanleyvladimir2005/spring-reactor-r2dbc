@@ -8,9 +8,7 @@ import com.mitocode.util.PageSupport;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,7 +20,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
@@ -37,7 +34,7 @@ public class BillController {
 
     @GetMapping
     public Mono<ResponseEntity<Flux<Bill>>> findAll() {
-        Flux<Bill> fxBilles = service.findAll();
+        var fxBilles = service.findAll();
         return Mono.just(ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -57,12 +54,12 @@ public class BillController {
 
     @PostMapping
     public Mono<ServerResponse> save(@Valid @RequestBody Bill bill,  final ServerRequest req){
-        Mono<Bill> monoBill = req.bodyToMono(Bill.class);
+        var monoBill = req.bodyToMono(Bill.class);
         return monoBill.
                 map( bill1 -> {
-                    Gson gsonn = new Gson();
-                    BillItem[] itemsArray = gsonn.fromJson(bill.getItems(), BillItem[].class);
-                    List<BillItem> items = Arrays.asList(itemsArray);
+                    var gsonn = new Gson();
+                    var itemsArray = gsonn.fromJson(bill.getItems(), BillItem[].class);
+                    var items = Arrays.asList(itemsArray);
                     bill.setItemsList(items);
                     return bill1;
                 })
@@ -75,9 +72,8 @@ public class BillController {
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<Bill>> update(@Valid @RequestBody Bill bill, @PathVariable("id") Integer id){
-        Mono<Bill> monoBill = Mono.just(bill);
-        Mono<Bill> monoBD = service.findById(id);
-
+        var monoBill = Mono.just(bill);
+        var monoBD = service.findById(id);
         return monoBD
                 .zipWith(monoBill, (bd, pl) -> {
                     bd.setId(id);
@@ -107,8 +103,8 @@ public class BillController {
     @GetMapping("/hateoas/{id}")
     public Mono<EntityModel<Bill>> listByHateoas(@PathVariable("id") Integer id){
         //localhost:8080/Bills/60779cc08e37a27164468033
-        Mono<Link> link1 =linkTo(methodOn(BillController.class).findById(id)).withSelfRel().toMono();
-        Mono<Link> link2 =linkTo(methodOn(BillController.class).findById(id)).withSelfRel().toMono();
+        var link1 =linkTo(methodOn(BillController.class).findById(id)).withSelfRel().toMono();
+        var link2 =linkTo(methodOn(BillController.class).findById(id)).withSelfRel().toMono();
         return link1.zipWith(link2)
                 .map(function((left, right) -> Links.of(left, right)))
                 .zipWith(service.findById(id), (lk, p) -> EntityModel.of(p, lk));
@@ -117,7 +113,7 @@ public class BillController {
     @GetMapping("/pageable")
     public Mono<ResponseEntity<PageSupport<Bill>>> listPagebale(@RequestParam(name = "page", defaultValue = "0") int page,
                                                                 @RequestParam(name = "size", defaultValue = "10") int size	){
-        Pageable pageRequest = PageRequest.of(page, size);
+        var pageRequest = PageRequest.of(page, size);
         return service.listPage(pageRequest)
                 .map(p -> ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)

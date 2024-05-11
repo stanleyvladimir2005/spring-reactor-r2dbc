@@ -6,9 +6,7 @@ import com.mitocode.util.PageSupport;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +27,7 @@ public class ClientController {
 
     @GetMapping
     public Mono<ResponseEntity<Flux<Client>>> findAll() {
-        Flux<Client> fxclientes = service.findAll();
+        var fxclientes = service.findAll();
         return Mono.just(ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -58,8 +56,8 @@ public class ClientController {
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<Client>> update(@Valid @RequestBody Client client, @PathVariable("id") Integer id){
-        Mono<Client> monoclient = Mono.just(client);
-        Mono<Client> monoBD = service.findById(id);
+        var monoclient = Mono.just(client);
+        var monoBD = service.findById(id);
         return monoBD.zipWith(monoclient, (bd, pl) -> {
             bd.setId(id);
             bd.setFirstName(pl.getFirstName());
@@ -86,8 +84,8 @@ public class ClientController {
     @GetMapping("/hateoas/{id}")
     public Mono<EntityModel<Client>> listByHateoas(@PathVariable("id") Integer id){
         //localhost:8080/clientes/60779cc08e37a27164468033
-        Mono<Link> link1 =linkTo(methodOn(ClientController.class).findById(id)).withSelfRel().toMono();
-        Mono<Link> link2 =linkTo(methodOn(ClientController.class).findById(id)).withSelfRel().toMono();
+        var link1 =linkTo(methodOn(ClientController.class).findById(id)).withSelfRel().toMono();
+        var link2 =linkTo(methodOn(ClientController.class).findById(id)).withSelfRel().toMono();
         return link1.zipWith(link2)
                 .map(function((left, right) -> Links.of(left, right)))
                 .zipWith(service.findById(id), (lk, p) -> EntityModel.of(p, lk));
@@ -96,7 +94,7 @@ public class ClientController {
     @GetMapping("/pageable")
     public Mono<ResponseEntity<PageSupport<Client>>> listPagebale (@RequestParam(name = "page", defaultValue = "0") int page,
                                                                    @RequestParam(name = "size", defaultValue = "10") int size) {
-        Pageable pageRequest = PageRequest.of(page, size);
+        var pageRequest = PageRequest.of(page, size);
         return service.listPage(pageRequest)
                 .map(p -> ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)

@@ -6,9 +6,7 @@ import com.mitocode.util.PageSupport;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +27,7 @@ public class DishController {
 
     @GetMapping
     public Mono<ResponseEntity<Flux<Dish>>> findAll() {
-        Flux<Dish> fxDishes = service.findAll();
+        var fxDishes = service.findAll();
         return Mono.just(ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -58,8 +56,8 @@ public class DishController {
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<Dish>> update(@Valid @RequestBody Dish dish, @PathVariable("id") Integer id){
-        Mono<Dish> monoDish = Mono.just(dish);
-        Mono<Dish> monoBD = service.findById(id);
+        var monoDish = Mono.just(dish);
+        var monoBD = service.findById(id);
         return monoBD
                 .zipWith(monoDish, (bd, pl) -> {
                     bd.setId(id);
@@ -86,16 +84,17 @@ public class DishController {
     @GetMapping("/hateoas/{id}")
     public Mono<EntityModel<Dish>> listByHateoas(@PathVariable("id") Integer id){
         //localhost:8080/Dishes/60779cc08e37a27164468033
-        Mono<Link> link1 =linkTo(methodOn(DishController.class).findById(id)).withSelfRel().toMono();
-        Mono<Link> link2 =linkTo(methodOn(DishController.class).findById(id)).withSelfRel().toMono();
+        var link1 =linkTo(methodOn(DishController.class).findById(id)).withSelfRel().toMono();
+        var link2 =linkTo(methodOn(DishController.class).findById(id)).withSelfRel().toMono();
         return link1.zipWith(link2)
                 .map(function((left, right) -> Links.of(left, right)))
                 .zipWith(service.findById(id), (lk, p) -> EntityModel.of(p, lk));
     }
 
     @GetMapping("/pageable")
-    public Mono<ResponseEntity<PageSupport<Dish>>> listPagebale(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size	){
-        Pageable pageRequest = PageRequest.of(page, size);
+    public Mono<ResponseEntity<PageSupport<Dish>>> listPagebale(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                                @RequestParam(name = "size", defaultValue = "10") int size	){
+        var pageRequest = PageRequest.of(page, size);
         return service.listPage(pageRequest)
                 .map(p -> ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)

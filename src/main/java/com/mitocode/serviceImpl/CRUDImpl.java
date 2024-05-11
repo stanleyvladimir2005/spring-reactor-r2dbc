@@ -42,8 +42,7 @@ public abstract class CRUDImpl<T,ID> implements ICRUD<T,ID> {
         return getRepo().findAll() //Flux<T>
                 .collectList() //Mono<List<T>>
                 .map(list -> new PageSupport<>(
-                                list
-                                        .stream()
+                                list.stream()
                                         .skip((long) page.getPageNumber() * page.getPageSize())
                                         .limit(page.getPageSize())
                                         .collect(Collectors.toList()),
